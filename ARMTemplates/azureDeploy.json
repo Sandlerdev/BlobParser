@@ -334,7 +334,8 @@
             "location": "[variables('location')]",
             "tags": "[variables('resourceTags')]",
             "dependsOn": [
-                           "[resourceId('Microsoft.Web/serverfarms',variables('serverfarms_host_name'))]",
+                            "[resourceId('Microsoft.Sql/servers/databases', variables('sql_server_name'), variables('sql_db_name'))]",
+                            "[resourceId('Microsoft.Web/serverfarms',variables('serverfarms_host_name'))]",
                             "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
                         ],
             "kind": "functionapp",
@@ -348,10 +349,12 @@
                 "siteConfig": {
                 "appSettings":[
                     {
-                        //TODO: make dynamic
                         "name": "AzureWebJobsStorage",
                         "value": "[Concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';EndpointSuffix=',environment().suffixes.storage,';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
-
+                    },
+                    {
+                        "name": "storageconnection",
+                        "value": "[Concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';EndpointSuffix=',environment().suffixes.storage,';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
                     },
                     {
                         "name": "FUNCTIONS_EXTENSION_VERSION",

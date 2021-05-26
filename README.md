@@ -23,7 +23,6 @@ This repo contains an ARM Template which can be used to deploy this solution.  Y
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FSandlerdev%2FBlobParser%2Fmaster%2FARMTemplates%2FazureDeploy.json)
 
-[![Visualize](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/visualizebutton.svg?sanitize=true)](http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FSandlerdev%2FBlobParser%2Fmaster%2FARMTemplates%2FazureDeploy.json)
 
 ## Local Build and Debugging
 

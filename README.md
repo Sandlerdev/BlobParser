@@ -23,6 +23,7 @@ This repo contains an ARM Template which can be used to deploy this solution.  Y
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FSandlerdev%2FBlobParser%2Fmaster%2FARMTemplates%2FazureDeploy.json)
 
+
 ## Local Build and Debugging
 
 To run this project locally you will need Visual Studio 2019 or VSCode.  See the following article for more info:

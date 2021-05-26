@@ -1,0 +1,505 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "projectName": {
+      "type": "string",
+      "defaultValue": "dto",
+      "minLength": 1,
+      "maxLength": 11,
+      "metadata": {
+        "description": "Define the project name or prefix for all objects."
+      }
+    },
+
+    "skuName": {
+      "type": "string",
+      "defaultValue": "S1",
+      "metadata": {
+        "description": "The SKU to use for the IoT Hub."
+      }
+    },
+    "skuUnits": {
+      "type": "string",
+      "defaultValue": "1",
+      "metadata": {
+        "description": "The number of IoT Hub units."
+      }
+    },
+    "d2cPartitions": {
+      "type": "string",
+      "defaultValue": "4",
+      "metadata": {
+        "description": "Partitions used for the event stream."
+      }
+    },
+
+        "sqlAdminLogin": {
+            "type": "string",
+            "defaultValue":"DTOAdmin",
+            "metadata": {
+                "description":"Login for SQL Server Instance"
+            }
+        },
+        "sqlAdminPassword":{
+            "type": "securestring",
+            "metadata": {
+                "description":"Password for SQL instance."
+            }
+
+        }
+
+  },
+  "variables": {
+    "iotHubName": "[concat(parameters('projectName'), '-hub-', uniqueString(resourceGroup().id))]",
+    "storageAccountName": "[concat(toLower(parameters('projectName')), uniqueString(resourceGroup().id))]",
+    "storageEndpoint": "[concat(parameters('projectName'), 'StorageEndpont')]",
+    "location":"[resourceGroup().location]",
+    "storageContainerName":"iotdata",
+    "serverfarms_host_name":"[concat(parameters('projectName'), '-host-', uniqueString(resourceGroup().id))]",
+    "sql_server_name": "[concat(parameters('projectName'), '-sql-', uniqueString(resourceGroup().id))]",
+    "sql_db_name":"[concat(parameters('projectName'), '-db-', uniqueString(resourceGroup().id))]",
+    "funcApp_name":"[concat(parameters('projectName'), '-func-', uniqueString(resourceGroup().id))]",
+    "serverfarm_externalid":"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.Web/serverfarms/',variables('serverfarms_host_name'))]",
+    "resourceTags":{
+            "OwnerEmail": "Snsandler@rockwellautomation.com",
+            "Environment": "Sandbox",
+            "Lifespan": "weeks",
+            "BusinessUnit": "GSM - 535 - INFORMATION SOFTWARE",
+            "Capability": "Design and Develop Product Offering",
+            "CostCenter": "13065",
+            "DataClassification": "Confidential"
+        }
+
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2019-06-01",
+      "name": "[variables('storageAccountName')]",
+      "location": "[variables('location')]",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "kind": "Storage",
+      "properties": {},
+      "resources": [
+        {
+          "type": "blobServices/containers",
+          "apiVersion": "2019-06-01",
+          "name": "[concat('default/', variables('storageContainerName'))]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+          ],
+          "properties": {
+            "publicAccess": "None"
+          }
+        }
+      ]
+    },
+    {
+      "type": "Microsoft.Devices/IotHubs",
+      "apiVersion": "2020-07-10-preview",
+      "name": "[variables('iotHubName')]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+      ],
+      "sku": {
+        "name": "[parameters('skuName')]",
+        "capacity": "[parameters('skuUnits')]"
+      },
+      "properties": {
+        "eventHubEndpoints": {
+          "events": {
+            "retentionTimeInDays": 1,
+            "partitionCount": "[parameters('d2cPartitions')]"
+          }
+        },
+        "routing": {
+          "endpoints": {
+            "storageContainers": [
+              {
+                "connectionString": "[Concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';EndpointSuffix=',environment().suffixes.storage,';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]",
+                "containerName": "[variables('storageContainerName')]",
+                "fileNameFormat": "{iothub}/{partition}/{YYYY}/{MM}/{DD}/{HH}/{mm}",
+                "batchFrequencyInSeconds": 100,
+                "maxChunkSizeInBytes": 104857600,
+                "encoding": "json",
+                "name": "[variables('storageEndpoint')]"
+              }
+            ]
+          },
+          "routes": [
+            {
+              "name": "IoTStorageRoute",
+              "source": "DeviceMessages",
+              "condition": "true",
+              "endpointNames": [
+                "[variables('storageEndpoint')]"
+              ],
+              "isEnabled": true
+            }
+          ],
+          "fallbackRoute": {
+            "name": "$fallback",
+            "source": "DeviceMessages",
+            "condition": "true",
+            "endpointNames": [
+              "events"
+            ],
+            "isEnabled": true
+          }
+        },
+        "messagingEndpoints": {
+          "fileNotifications": {
+            "lockDurationAsIso8601": "PT1M",
+            "ttlAsIso8601": "PT1H",
+            "maxDeliveryCount": 10
+          }
+        },
+        "enableFileUploadNotifications": false,
+        "cloudToDevice": {
+          "maxDeliveryCount": 10,
+          "defaultTtlAsIso8601": "PT1H",
+          "feedback": {
+            "lockDurationAsIso8601": "PT1M",
+            "ttlAsIso8601": "PT1H",
+            "maxDeliveryCount": 10
+          }
+        }
+      }
+    },
+            {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "name": "[variables('serverfarms_host_name')]",
+            "location": "[variables('location')]",
+            "tags": "[variables('resourceTags')]",
+            "sku": {
+                "name": "P1v2",
+                "tier": "PremiumV2",
+                "size": "P1v2",
+                "family": "Pv2",
+                "capacity": 1
+            },
+            "kind": "linux",
+            "properties": {
+                "perSiteScaling": false,
+                "maximumElasticWorkerCount": 1,
+                "isSpot": false,
+                "reserved": true,
+                "isXenon": false,
+                "hyperV": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            }
+
+        },
+        {
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[variables('sql_server_name')]",
+            "location": "[variables('location')]",
+            "tags": "[variables('resourceTags')]",
+            "kind": "v12.0",
+            "properties": {
+                "administratorLogin": "[parameters('sqlAdminLogin')]",
+                "administratorLoginPassword" : "[parameters('sqlAdminPassword')]",
+                "version": "12.0",
+                "publicNetworkAccess": "Enabled"
+            }
+        },
+
+        {
+            "type": "Microsoft.Sql/servers/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(variables('sql_server_name'), '/ForceLastGoodPlan')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('sql_server_name'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Enabled"
+            }
+        },
+
+        {
+            "type": "Microsoft.Sql/servers/databases",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(variables('sql_server_name'), '/' ,variables('sql_db_name'))]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('sql_server_name'))]"
+            ],
+            "tags": "[variables('resourceTags')]",
+            "sku": {
+                "name": "Basic",
+                "tier": "Basic",
+                "capacity": 5
+            },
+            "kind": "v12.0,user",
+            "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
+                "maxSizeBytes": 2147483648,
+                "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                "zoneRedundant": false,
+                "readScale": "Disabled",
+                "storageAccountType": "GRS",
+                "maintenanceConfigurationId": "/subscriptions/dfbdbcfc-969a-4679-86c0-ad2c438e14ae/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default"
+            }
+        },
+
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(variables('sql_server_name'), '/AllowAllWindowsAzureIps')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('sql_server_name'))]"
+            ],
+            "properties": {
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "0.0.0.0"
+            }
+        },
+
+        {
+            "type": "Microsoft.Sql/servers/securityAlertPolicies",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(variables('sql_server_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('sql_server_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled"
+            }
+        },
+
+        {
+            "type": "Microsoft.Sql/servers/databases/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(variables('sql_server_name'), '/' ,variables('sql_db_name'),'/ForceLastGoodPlan')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('sql_server_name'), variables('sql_db_name'))]",
+                "[resourceId('Microsoft.Sql/servers', variables('sql_server_name'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Enabled"
+            }
+        },
+
+        {
+            "type": "Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(variables('sql_server_name'), '/' ,variables('sql_db_name'),'/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('sql_server_name'), variables('sql_db_name'))]",
+                "[resourceId('Microsoft.Sql/servers', variables('sql_server_name'))]"
+            ],
+            "properties": {
+                "weeklyRetention": "PT0S",
+                "monthlyRetention": "PT0S",
+                "yearlyRetention": "PT0S",
+                "weekOfYear": 1
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(variables('sql_server_name'), '/' ,variables('sql_db_name'),'/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('sql_server_name'), variables('sql_db_name'))]",
+                "[resourceId('Microsoft.Sql/servers', variables('sql_server_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 7
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "name": "[variables('funcApp_name')]",
+            "location": "[variables('location')]",
+            "tags": "[variables('resourceTags')]",
+            "dependsOn": [
+                           "[resourceId('Microsoft.Web/serverfarms',variables('serverfarms_host_name'))]",
+                            "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+                        ],
+            "kind": "app,linux,container",
+            "properties": {
+                "enabled": true,
+
+                "serverFarmId": "[variables('serverfarm_externalid')]",
+                "reserved": true,
+                "isXenon": false,
+                "hyperV": false,
+                "siteConfig": {
+                "appSettings":[
+                    {
+                        "name": "AzureWebJobsStorage",
+                        "value": "DefaultEndpointsProtocol=https;AccountName=storageaccountsandla3ed;AccountKey=UWv0ZXCyaI+2VWaYCvmEIHyKaVWMOj38aJ/FmFzY9/ARamz8H7WgzO0CkEOLPeYrz4MPydfjdav63q3XJ8XeBA==;EndpointSuffix=core.windows.net"
+                    },
+                    {
+                        "name": "ConnectionStrings__storageconnection",
+                        "value": "DefaultEndpointsProtocol=https;AccountName=sandlergeneraldata;AccountKey=JUAAp4mS9vU0MfTmpxaCuFyG5qaC9RQq5QNNcfPDOJAVKPbjHr4mQpgekqzEQrBbIw+IzuY4UZIB5YIBX/khyA==;BlobEndpoint=https://sandlergeneraldata.blob.core.windows.net/;TableEndpoint=https://sandlergeneraldata.table.core.windows.net/;QueueEndpoint=https://sandlergeneraldata.queue.core.windows.net/;FileEndpoint=https://sandlergeneraldata.file.core.windows.net/"
+                    },
+                    {
+                        "name": "sandlerTestIoTHub_events_IOTHUB",
+                        "value": "Endpoint=sb://iothub-ns-sandlertes-10402083-b2be686163.servicebus.windows.net/;SharedAccessKeyName=iothubowner;SharedAccessKey=IxA/iJnMe+z7LWEhPc9Zo4GaGtZ5MiqvJdZGoMYw7Zo=;EntityPath=sandlertestiothub",
+                        "slotSetting": false
+                    },
+
+                    {
+                        "name": "FUNCTIONS_EXTENSION_VERSION",
+                        "value": "~3"
+                    },
+                    {
+                        "name": "FUNCTIONS_WORKER_RUNTIME",
+                        "value": "dotnet"
+                    },
+                    //Need to parameterize the following
+                    {
+                        "name": "DOCKER_REGISTRY_SERVER_URL",
+                        "value": "https://dtodevregistry.azurecr.io"
+                    },
+                    {
+                        "name": "DOCKER_REGISTRY_SERVER_USERNAME",
+                        "value": "DTODevRegistry"
+                    },
+                    {
+                        "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
+                        "value": "oFEMlwhbAjYpyIcBRfh/cSnu/Dx/U8FW"
+                    },
+                    {
+                        "name": "table_name",
+                        "value": "AutoDeployTable"
+                    }
+
+                ],
+                "connectionStrings": [
+                    {
+                        "name":"SQLConnectionString",
+                        "value":"Data Source=tcp:sandler-sql-server2.database.windows.net,1433;Initial Catalog=sandlerIoTData2;User Id=GTLAdmin;Password=Ab1784kt"
+                    }
+                ]
+                },
+            "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": false,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 0,
+                "dailyMemoryTimeQuota": 0,
+                "httpsOnly": false,
+                "redundancyMode": "None"
+            }
+        },
+            {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(variables('funcApp_name'), '/web')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('funcApp_name'))]"
+            ],
+            "tags": "[variables('resourceTags')]",
+            "properties": {
+                "numberOfWorkers": 1,
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php",
+                    "hostingstart.html"
+                ],
+                "netFrameworkVersion": "v4.0",
+                "linuxFxVersion": "DOCKER|dtodevregistry.azurecr.io/blobparser:latest",
+                "requestTracingEnabled": false,
+                "remoteDebuggingEnabled": false,
+                "remoteDebuggingVersion": "VS2019",
+                "httpLoggingEnabled": true,
+                "logsDirectorySizeLimit": 35,
+                "detailedErrorLoggingEnabled": false,
+                "publishingUsername": "$BlobParser",
+                "azureStorageAccounts": {},
+                "scmType": "None",
+                "use32BitWorkerProcess": true,
+                "webSocketsEnabled": false,
+                "alwaysOn": true,
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": true
+                    }
+                ],
+                "loadBalancing": "LeastRequests",
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "autoHealEnabled": false,
+                "localMySqlEnabled": false,
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictionsUseMain": false,
+                "http20Enabled": false,
+                "minTlsVersion": "1.2",
+                "ftpsState": "AllAllowed",
+                "reservedInstanceCount": 0
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(variables('funcApp_name'), '/', variables('funcApp_name'))]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('funcApp_name'))]"
+            ],
+            "properties": {
+                "script_root_path_href": "https://blobparser.azurewebsites.net/admin/vfs/home/site/wwwroot/blobparser/",
+                "script_href": "https://blobparser.azurewebsites.net/admin/vfs/home/site/wwwroot/bin/blobparser.dll",
+                "config_href": "https://blobparser.azurewebsites.net/admin/vfs/home/site/wwwroot/blobparser/function.json",
+                "href": "https://blobparser.azurewebsites.net/admin/functions/blobparser",
+                "config": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(variables('funcApp_name'), '/', variables('funcApp_name'), '.azurewebsites.net')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('funcApp_name'))]"
+            ],
+            "properties": {
+                "siteName": "[variables('funcApp_name')]",
+                "hostNameType": "Verified"
+            }
+        }
+    //}
+
+  ],
+  "outputs": {
+  }
+}

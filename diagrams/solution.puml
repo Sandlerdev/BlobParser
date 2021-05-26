@@ -1,0 +1,34 @@
+@startuml
+
+!define AzurePuml https://raw.githubusercontent.com/plantuml-stdlib/Azure-PlantUML/release/2-1/dist
+!includeurl AzurePuml/AzureCommon.puml
+!includeurl AzurePuml/Databases/all.puml
+!includeurl AzurePuml/InternetOfThings/all.puml
+!includeurl AzurePuml/Compute/AzureFunction.puml
+!includeurl AzurePuml/Storage/AzureBlobStorage.puml
+!include https://raw.githubusercontent.com/adrianvlupu/C4-PlantUML/latest/C4_Dynamic.puml
+'LAYOUT_TOP_DOWN
+LAYOUT_LEFT_RIGHT
+'LAYOUT_AS_SKETCH()
+'LAYOUT_WITH_LEGEND()
+HIDE_STEREOTYPE()
+Boundary(onPrem,"On Premesis"){
+    Container(gw,"FactoryTalk Edge Gateway","Controller / Smart Object Data")
+
+}
+Boundary(cloud,"Azure Cloud Environment"){
+    AzureIoTHub(iot,"IoTHub","Size S1")
+    AzureBlobStorage(blob,"Blob Storage of IoT Data","LRS")
+
+
+    AzureFunction(func_blobParser,"Blob Parser","C# - Blob Trigger","Hosted on AppService")
+    AzureSqlDatabase(sql,"SQL DB", "DB Storage of IoT Data")
+
+}
+Rel(gw,iot,"Upload Data")
+
+Rel(iot,blob,"IoTHub Routing")
+Rel(func_blobParser,blob,"Listen for new Blobs")
+Rel(func_blobParser,sql,"Write IoT Data from Blobs")
+
+@enduml

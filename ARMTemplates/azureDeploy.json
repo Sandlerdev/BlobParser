@@ -35,7 +35,7 @@
     },
 
         "sqlAdminLogin": {
-            "type": "string",
+            "type": "securestring",
             "defaultValue":"DTOAdmin",
             "metadata": {
                 "description":"Login for SQL Server Instance"

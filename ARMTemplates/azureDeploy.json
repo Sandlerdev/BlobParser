@@ -334,6 +334,7 @@
             "location": "[variables('location')]",
             "tags": "[variables('resourceTags')]",
             "dependsOn": [
+                            "[resourceId('Microsoft.Sql/servers', variables('sql_server_name'))]",
                             "[resourceId('Microsoft.Sql/servers/databases', variables('sql_server_name'), variables('sql_db_name'))]",
                             "[resourceId('Microsoft.Web/serverfarms',variables('serverfarms_host_name'))]",
                             "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"

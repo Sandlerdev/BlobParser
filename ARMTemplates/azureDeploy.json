@@ -47,6 +47,13 @@
                 "description":"Password for SQL instance."
             }
 
+        },
+        "Table Name": {
+            "type": "string",
+            "defaultValue": "FTEG_Data",
+            "metadata":{
+                "description":"Name of the Table that data will be stored in, inside the SQL Server Database."
+            }
         }
 
   },
@@ -69,7 +76,12 @@
             "Capability": "Design and Develop Product Offering",
             "CostCenter": "13065",
             "DataClassification": "Confidential"
-        }
+        },
+    "DOCKER_REGISTRY_SERVER_URL":"https://dtodevregistry.azurecr.io",
+    "DOCKER_REGISTRY_SERVER_USERNAME":"DTODevRegistry",
+    "DOCKER_REGISTRY_SERVER_PASSWORD":"oFEMlwhbAjYpyIcBRfh/cSnu/Dx/U8FW",
+    "containerImage":"DOCKER|dtodevregistry.azurecr.io/blobparser:latest"
+
 
   },
   "resources": [
@@ -336,19 +348,11 @@
                 "siteConfig": {
                 "appSettings":[
                     {
+                        //TODO: make dynamic
                         "name": "AzureWebJobsStorage",
-                        "value": "DefaultEndpointsProtocol=https;AccountName=storageaccountsandla3ed;AccountKey=UWv0ZXCyaI+2VWaYCvmEIHyKaVWMOj38aJ/FmFzY9/ARamz8H7WgzO0CkEOLPeYrz4MPydfjdav63q3XJ8XeBA==;EndpointSuffix=core.windows.net"
-                    },
-                    {
-                        "name": "ConnectionStrings__storageconnection",
-                        "value": "DefaultEndpointsProtocol=https;AccountName=sandlergeneraldata;AccountKey=JUAAp4mS9vU0MfTmpxaCuFyG5qaC9RQq5QNNcfPDOJAVKPbjHr4mQpgekqzEQrBbIw+IzuY4UZIB5YIBX/khyA==;BlobEndpoint=https://sandlergeneraldata.blob.core.windows.net/;TableEndpoint=https://sandlergeneraldata.table.core.windows.net/;QueueEndpoint=https://sandlergeneraldata.queue.core.windows.net/;FileEndpoint=https://sandlergeneraldata.file.core.windows.net/"
-                    },
-                    {
-                        "name": "sandlerTestIoTHub_events_IOTHUB",
-                        "value": "Endpoint=sb://iothub-ns-sandlertes-10402083-b2be686163.servicebus.windows.net/;SharedAccessKeyName=iothubowner;SharedAccessKey=IxA/iJnMe+z7LWEhPc9Zo4GaGtZ5MiqvJdZGoMYw7Zo=;EntityPath=sandlertestiothub",
-                        "slotSetting": false
-                    },
+                        "value": "[Concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';EndpointSuffix=',environment().suffixes.storage,';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
 
+                    },
                     {
                         "name": "FUNCTIONS_EXTENSION_VERSION",
                         "value": "~3"
@@ -357,149 +361,41 @@
                         "name": "FUNCTIONS_WORKER_RUNTIME",
                         "value": "dotnet"
                     },
-                    //Need to parameterize the following
+
                     {
                         "name": "DOCKER_REGISTRY_SERVER_URL",
-                        "value": "https://dtodevregistry.azurecr.io"
+                        "value": "[variables('DOCKER_REGISTRY_SERVER_URL')]"
                     },
                     {
                         "name": "DOCKER_REGISTRY_SERVER_USERNAME",
-                        "value": "DTODevRegistry"
+                        "value": "[variables('DOCKER_REGISTRY_SERVER_USERNAME')]"
                     },
                     {
                         "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
-                        "value": "oFEMlwhbAjYpyIcBRfh/cSnu/Dx/U8FW"
+                        "value": "[variables('DOCKER_REGISTRY_SERVER_PASSWORD')]"
                     },
                     {
+
                         "name": "table_name",
-                        "value": "AutoDeployTable"
+                        "value": "[parameters('Table Name')]"
                     }
 
                 ],
                 "connectionStrings": [
                     {
+
                         "name":"SQLConnectionString",
-                        "value":"Data Source=tcp:sandler-sql-server2.database.windows.net,1433;Initial Catalog=sandlerIoTData2;User Id=GTLAdmin;Password=Ab1784kt"
+                        "value":"[Concat('Data Source=tcp:',variables('sql_server_name'),'.database.windows.net,1433;Initial Catalog=',variables('sql_db_name'),';User Id=',parameters('sqlAdminLogin'),';Password=',parameters('sqlAdminPassword'))]"
+
                     }
                 ],
-                "linuxFxVersion": "DOCKER|dtodevregistry.azurecr.io/blobparser:latest"
+
+                "linuxFxVersion": "[variables('containerImage')]"
             }
-                //,
-            // "scmSiteAlsoStopped": false,
-            //     "clientAffinityEnabled": false,
-            //     "clientCertEnabled": false,
-            //     "hostNamesDisabled": false,
-            //     "containerSize": 0,
-            //     "dailyMemoryTimeQuota": 0,
-            //     "httpsOnly": false,
-            //     "redundancyMode": "None"
+
             }
-        }//,
-            // {
-            // "type": "Microsoft.Web/sites/config",
-            // "apiVersion": "2018-11-01",
-            // "name": "[concat(variables('funcApp_name'), '/web')]",
-            // "location": "[variables('location')]",
-            // "dependsOn": [
-            //     "[resourceId('Microsoft.Web/sites', variables('funcApp_name'))]"
-            // ],
-            // "tags": "[variables('resourceTags')]",
-            // "properties": {
-            //     "numberOfWorkers": 1,
-            //     "defaultDocuments": [
-            //         "Default.htm",
-            //         "Default.html",
-            //         "Default.asp",
-            //         "index.htm",
-            //         "index.html",
-            //         "iisstart.htm",
-            //         "default.aspx",
-            //         "index.php",
-            //         "hostingstart.html"
-            //     ],
-            //     "netFrameworkVersion": "v4.0",
-            //     "linuxFxVersion": "DOCKER|dtodevregistry.azurecr.io/blobparser:latest",
-            //     "requestTracingEnabled": false,
-            //     "remoteDebuggingEnabled": false,
-            //     "remoteDebuggingVersion": "VS2019",
-            //     "httpLoggingEnabled": true,
-            //     "logsDirectorySizeLimit": 35,
-            //     "detailedErrorLoggingEnabled": false,
-            //     "publishingUsername": "$BlobParser",
-            //     "azureStorageAccounts": {},
-            //     "scmType": "None",
-            //     "use32BitWorkerProcess": true,
-            //     "webSocketsEnabled": false,
-            //     "alwaysOn": true,
-            //     "managedPipelineMode": "Integrated",
-            //     "virtualApplications": [
-            //         {
-            //             "virtualPath": "/",
-            //             "physicalPath": "site\\wwwroot",
-            //             "preloadEnabled": true
-            //         }
-            //     ],
-            //     "loadBalancing": "LeastRequests",
-            //     "experiments": {
-            //         "rampUpRules": []
-            //     },
-            //     "autoHealEnabled": false,
-            //     "localMySqlEnabled": false,
-            //     "ipSecurityRestrictions": [
-            //         {
-            //             "ipAddress": "Any",
-            //             "action": "Allow",
-            //             "priority": 1,
-            //             "name": "Allow all",
-            //             "description": "Allow all access"
-            //         }
-            //     ],
-            //     "scmIpSecurityRestrictions": [
-            //         {
-            //             "ipAddress": "Any",
-            //             "action": "Allow",
-            //             "priority": 1,
-            //             "name": "Allow all",
-            //             "description": "Allow all access"
-            //         }
-            //     ],
-            //     "scmIpSecurityRestrictionsUseMain": false,
-            //     "http20Enabled": false,
-            //     "minTlsVersion": "1.2",
-            //     "ftpsState": "AllAllowed",
-            //     "reservedInstanceCount": 0
-            // }
-        //},
-        // {
-        //     "type": "Microsoft.Web/sites/functions",
-        //     "apiVersion": "2018-11-01",
-        //     "name": "[concat(variables('funcApp_name'), '/', variables('funcApp_name'))]",
-        //     "location": "[variables('location')]",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Web/sites', variables('funcApp_name'))]"
-        //     ],
-        //     "properties": {
-        //         "script_root_path_href": "https://blobparser.azurewebsites.net/admin/vfs/home/site/wwwroot/blobparser/",
-        //         "script_href": "https://blobparser.azurewebsites.net/admin/vfs/home/site/wwwroot/bin/blobparser.dll",
-        //         "config_href": "https://blobparser.azurewebsites.net/admin/vfs/home/site/wwwroot/blobparser/function.json",
-        //         "href": "https://blobparser.azurewebsites.net/admin/functions/blobparser",
-        //         "config": {}
-        //     }
-        // },
-        // {
-        //     "type": "Microsoft.Web/sites/hostNameBindings",
-        //     "apiVersion": "2018-11-01",
-        //     "name": "[concat(variables('funcApp_name'), '/', variables('funcApp_name'), '.azurewebsites.net')]",
-        //     "location": "[variables('location')]",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Web/sites', variables('funcApp_name'))]"
-        //     ],
-        //     "properties": {
-        //         "siteName": "[variables('funcApp_name')]",
-        //         "hostNameType": "Verified"
-        //     }
-       // }
-    //}
+        }
+
 
   ],
   "outputs": {

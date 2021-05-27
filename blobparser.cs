@@ -20,7 +20,7 @@ namespace blobparser
         public static string _sqlconnectionString;
         public static bool _createdTable = false;
         [FunctionName("blobparser")]
-        public static void Run([BlobTrigger("iotdata/sandlerTestIoTHub/{name}", Connection = "storageconnection")]Stream myBlob, string name, ILogger log, ExecutionContext context)
+        public static void Run([BlobTrigger("iotdata/{name}", Connection = "storageconnection")]Stream myBlob, string name, ILogger log, ExecutionContext context)
         {
             //log.LogInformation($"C# Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes");
                         _log = log;

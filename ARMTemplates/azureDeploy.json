@@ -398,7 +398,8 @@
                     }
                 ],
 
-                "linuxFxVersion": "[variables('containerImage')]"
+                "linuxFxVersion": "[variables('containerImage')]",
+                "alwaysOn": true
             }
 
             }

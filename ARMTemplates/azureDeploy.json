@@ -391,7 +391,7 @@
                     {
 
                         "name":"SQLConnectionString",
-                        "connectionString": "[concat('Data Source=tcp:', reference(resourceId('Microsoft.Sql/servers/', variables('sql_server_name'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('sql_db_name'), ';User Id=', parameters('sqlAdminLogin'), '@', variables('sql_server_name'), ';Password=', parameters('sqlAdminPassword'), ';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]",
+                        "connectionString": "[concat('Server=tcp:', reference(resourceId('Microsoft.Sql/servers/', variables('sql_server_name'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('sql_db_name'), ';User Id=', parameters('sqlAdminLogin'), '@', variables('sql_server_name'), ';Password=', parameters('sqlAdminPassword'), ';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]",
                         "type": "SQLAzure"
 
 

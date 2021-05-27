@@ -4,7 +4,7 @@
   "parameters": {
     "projectName": {
       "type": "string",
-      "defaultValue": "dto",
+      "defaultValue": "FTIS",
       "minLength": 1,
       "maxLength": 11,
       "metadata": {
@@ -36,7 +36,7 @@
 
         "sqlAdminLogin": {
             "type": "string",
-            "defaultValue":"DTOAdmin",
+            "defaultValue":"FTISAdmin",
             "metadata": {
                 "description":"Login for SQL Server Instance"
             }

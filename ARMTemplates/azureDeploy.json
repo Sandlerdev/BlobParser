@@ -35,7 +35,7 @@
     },
 
         "sqlAdminLogin": {
-            "type": "securestring",
+            "type": "string",
             "defaultValue":"DTOAdmin",
             "metadata": {
                 "description":"Login for SQL Server Instance"
@@ -389,7 +389,8 @@
                     {
 
                         "name":"SQLConnectionString",
-                        "value":"[Concat('Data Source=tcp:',variables('sql_server_name'),'.database.windows.net,1433;Initial Catalog=',variables('sql_db_name'),';User Id=',parameters('sqlAdminLogin'),';Password=',parameters('sqlAdminPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]"
+                        "value": "[concat('Data Source=tcp:', reference(resourceId('Microsoft.Sql/servers/', variables('sql_server_name'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('sql_db_name'), ';User Id=', parameters('sqlAdminLogin'), '@', variables('sql_server_name'), ';Password=', parameters('sqlAdminPassword'), ';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]"
+                        //"value":"[Concat('Data Source=tcp:',variables('sql_server_name'),'.database.windows.net,1433;Initial Catalog=',variables('sql_db_name'),';User Id=',parameters('sqlAdminLogin'),';Password=',parameters('sqlAdminPassword'),';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]"
 
                     }
                 ],

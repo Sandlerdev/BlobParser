@@ -428,7 +428,7 @@
                     "hostingstart.html"
                 ],
                 "netFrameworkVersion": "v4.0",
-                "linuxFxVersion": "[variables('DOCKER_REGISTRY_SERVER_URL')]",
+                "linuxFxVersion": "[variables('containerImage')]",
                 "requestTracingEnabled": false,
                 "remoteDebuggingEnabled": false,
                 "remoteDebuggingVersion": "VS2019",

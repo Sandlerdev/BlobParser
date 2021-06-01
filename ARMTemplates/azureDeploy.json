@@ -341,7 +341,7 @@
                             "[resourceId('Microsoft.Web/serverfarms',variables('serverfarms_host_name'))]",
                             "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
                         ],
-            "kind": "linux,functionapp,container",
+            "kind": "app,linux,container",
             "properties": {
                 "enabled": true,
 
@@ -349,6 +349,7 @@
                 "reserved": true,
                 "isXenon": false,
                 "hyperV": false,
+                "httpsOnly": true,
                 "siteConfig": {
                 "appSettings":[
                     {
@@ -396,14 +397,119 @@
 
 
                     }
-                ],
-                "DOCKER_CUSTOM_IMAGE_NAME": "[variables('containerImage')]",
-                "linuxFxVersion": "[variables('containerImage')]",
-                "alwaysOn": true
+                ]
+                // "DOCKER_CUSTOM_IMAGE_NAME": "[variables('containerImage')]",
+                // "linuxFxVersion": "[variables('containerImage')]",
+                // "alwaysOn": true
             }
 
             }
+        },
+        {
+          "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(variables('funcApp_name'), '/web')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('funcApp_name'))]"
+            ],
+            "tags": "[variables('resourceTags')]",
+            "properties": {
+                "numberOfWorkers": 1,
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php",
+                    "hostingstart.html"
+                ],
+                "netFrameworkVersion": "v4.0",
+                "linuxFxVersion": "[variables('DOCKER_REGISTRY_SERVER_URL')]",
+                "requestTracingEnabled": false,
+                "remoteDebuggingEnabled": false,
+                "remoteDebuggingVersion": "VS2019",
+                "httpLoggingEnabled": true,
+                "logsDirectorySizeLimit": 35,
+                "detailedErrorLoggingEnabled": false,
+                "publishingUsername": "$BlobParser",
+                "azureStorageAccounts": {},
+                "scmType": "None",
+                "use32BitWorkerProcess": true,
+                "webSocketsEnabled": false,
+                "alwaysOn": true,
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": true
+                    }
+                ],
+                "loadBalancing": "LeastRequests",
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "autoHealEnabled": false,
+                "localMySqlEnabled": false,
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictionsUseMain": false,
+                "http20Enabled": false,
+                "minTlsVersion": "1.2",
+                "ftpsState": "AllAllowed",
+                "reservedInstanceCount": 0
+            }
+        },
+          {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(variables('funcApp_name'), '/', variables('funcApp_name'))]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('funcApp_name'))]"
+            ],
+            "properties": {
+                // "script_root_path_href": "https://blobparser.azurewebsites.net/admin/vfs/home/site/wwwroot/blobparser/",
+                // "script_href": "https://blobparser.azurewebsites.net/admin/vfs/home/site/wwwroot/bin/blobparser.dll",
+                // "config_href": "https://blobparser.azurewebsites.net/admin/vfs/home/site/wwwroot/blobparser/function.json",
+                // "href": "https://blobparser.azurewebsites.net/admin/functions/blobparser",
+                "config": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(variables('funcApp_name'), '/', variables('funcApp_name'), '.azurewebsites.net')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('funcApp_name'))]"
+            ],
+            "properties": {
+                "siteName": "[variables('funcApp_name')]",
+                "hostNameType": "Verified"
+            }
         }
+      
 
 
   ],

@@ -80,7 +80,7 @@
     "DOCKER_REGISTRY_SERVER_URL":"https://dtodevregistry.azurecr.io",
     "DOCKER_REGISTRY_SERVER_USERNAME":"DTODevRegistry",
     "DOCKER_REGISTRY_SERVER_PASSWORD":"oFEMlwhbAjYpyIcBRfh/cSnu/Dx/U8FW",
-    "containerImage":"DOCKER|dtodevregistry.azurecr.io/f3:latest"
+    "containerImage":"DOCKER|dtodevregistry.azurecr.io/blobparser:latest"
 
 
   },
@@ -225,18 +225,6 @@
                 "publicNetworkAccess": "Enabled"
             }
         },
-
-        // {
-        //     "type": "Microsoft.Sql/servers/advisors",
-        //     "apiVersion": "2014-04-01",
-        //     "name": "[concat(variables('sql_server_name'), '/ForceLastGoodPlan')]",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Sql/servers', variables('sql_server_name'))]"
-        //     ],
-        //     "properties": {
-        //         "autoExecuteValue": "Enabled"
-        //     }
-        // },
 
         {
             "type": "Microsoft.Sql/servers/databases",
@@ -435,7 +423,7 @@
                 "httpLoggingEnabled": true,
                 "logsDirectorySizeLimit": 35,
                 "detailedErrorLoggingEnabled": false,
-                "publishingUsername": "$BlobParser",
+                //"publishingUsername": "$BlobParser",
                 "azureStorageAccounts": {},
                 "scmType": "None",
                 "use32BitWorkerProcess": true,

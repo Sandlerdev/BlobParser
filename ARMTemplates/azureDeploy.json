@@ -50,7 +50,7 @@
         },
         "Table Name": {
             "type": "string",
-            "defaultValue": "FTEG_Data",
+            "defaultValue": "FTEG_Data_test",
             "metadata":{
                 "description":"Name of the Table that data will be stored in, inside the SQL Server Database."
             }
@@ -137,7 +137,7 @@
               {
                 "connectionString": "[Concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';EndpointSuffix=',environment().suffixes.storage,';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]",
                 "containerName": "[variables('storageContainerName')]",
-                "fileNameFormat": "{iothub}/{partition}/{YYYY}/{MM}/{DD}/{HH}/{mm}",
+                "fileNameFormat": "{iothub}/{partition}/{YYYY}/{MM}/{DD}/{HH}/{mm}.json",
                 "batchFrequencyInSeconds": 100,
                 "maxChunkSizeInBytes": 104857600,
                 "encoding": "json",
@@ -341,7 +341,7 @@
                             "[resourceId('Microsoft.Web/serverfarms',variables('serverfarms_host_name'))]",
                             "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
                         ],
-            "kind": "functionapp",
+            "kind": "linux,functionapp",
             "properties": {
                 "enabled": true,
 

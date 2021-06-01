@@ -341,7 +341,7 @@
                             "[resourceId('Microsoft.Web/serverfarms',variables('serverfarms_host_name'))]",
                             "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
                         ],
-            "kind": "linux,functionapp",
+            "kind": "linux,functionapp,container",
             "properties": {
                 "enabled": true,
 
@@ -397,7 +397,7 @@
 
                     }
                 ],
-
+                "DOCKER_CUSTOM_IMAGE_NAME": "[variables('containerImage')]",
                 "linuxFxVersion": "[variables('containerImage')]",
                 "alwaysOn": true
             }

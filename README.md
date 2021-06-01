@@ -21,7 +21,7 @@ The architecture in this solution was selected to meet the following requirement
 
 This repo contains an ARM Template which can be used to deploy this solution.  You can clone the repo and modify the template to meet your needs or simply click the button below to initiate a deployment with the pre-configured values.
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FSandlerdev%2FBlobParser%2Fmaster%2FARMTemplates%2FazureDeploy.json)
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FSandlerdev%2FBlobParser%2Fwebappfunc%2FARMTemplates%2FazureDeploy.json)
 
 
 ## Local Build and Debugging

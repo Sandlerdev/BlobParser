@@ -419,7 +419,7 @@
                 "netFrameworkVersion": "v4.0",
                 "linuxFxVersion": "[variables('containerImage')]",
                 "requestTracingEnabled": false,
-                "remoteDebuggingEnabled": false,
+                "remoteDebuggingEnabled": true,
                 "remoteDebuggingVersion": "VS2019",
                 "httpLoggingEnabled": true,
                 "logsDirectorySizeLimit": 35,

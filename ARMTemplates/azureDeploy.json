@@ -66,7 +66,8 @@
     "serverfarms_host_name":"[concat(parameters('projectName'), '-host-', uniqueString(resourceGroup().id))]",
     "sql_server_name": "[concat(parameters('projectName'), '-sql-', uniqueString(resourceGroup().id))]",
     "sql_db_name":"[concat(parameters('projectName'), '-db-', uniqueString(resourceGroup().id))]",
-    "funcApp_name":"[concat(parameters('projectName'), '-func3-', uniqueString(resourceGroup().id))]",
+    //"funcApp_name":"[concat(parameters('projectName'), '-func3-', uniqueString(resourceGroup().id))]",
+    "funcApp_name":"BlobParser",
     "serverfarm_externalid":"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.Web/serverfarms/',variables('serverfarms_host_name'))]",
     "resourceTags":{
             "OwnerEmail": "Snsandler@rockwellautomation.com",
@@ -477,10 +478,10 @@
                 "[resourceId('Microsoft.Web/sites', variables('funcApp_name'))]"
             ],
             "properties": {
-                // "script_root_path_href": "https://blobparser.azurewebsites.net/admin/vfs/home/site/wwwroot/blobparser/",
-                // "script_href": "https://blobparser.azurewebsites.net/admin/vfs/home/site/wwwroot/bin/blobparser.dll",
-                // "config_href": "https://blobparser.azurewebsites.net/admin/vfs/home/site/wwwroot/blobparser/function.json",
-                // "href": "https://blobparser.azurewebsites.net/admin/functions/blobparser",
+                "script_root_path_href": "[concat('https://',variables('funcApp_name'),'.azurewebsites.net/admin/vfs/home/site/wwwroot/',variables('funcApp_name'),'/')]",
+                "script_href": "[concat('https://',variables('funcApp_name'),'.azurewebsites.net/admin/vfs/home/site/wwwroot/bin/',variables('funcApp_name'),'.dll')]",
+                "config_href": "[concat('https://',variables('funcApp_name'),'.azurewebsites.net/admin/vfs/home/site/wwwroot/',variables('funcApp_name'),'/function.json')]",
+                "href": "[concat('https://',variables('funcApp_name'),'.azurewebsites.net/admin/functions/',variables('funcApp_name'))]",
                 "config": {}
             }
         },

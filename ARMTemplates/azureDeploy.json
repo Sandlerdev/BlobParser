@@ -66,8 +66,8 @@
     "serverfarms_host_name":"[concat(parameters('projectName'), '-host-', uniqueString(resourceGroup().id))]",
     "sql_server_name": "[concat(parameters('projectName'), '-sql-', uniqueString(resourceGroup().id))]",
     "sql_db_name":"[concat(parameters('projectName'), '-db-', uniqueString(resourceGroup().id))]",
-    //"funcApp_name":"[concat(parameters('projectName'), '-func3-', uniqueString(resourceGroup().id))]",
-    "funcApp_name":"BlobParser",
+    "funcApp_name":"[concat(parameters('projectName'), '-func3-', uniqueString(resourceGroup().id))]",
+    //"funcApp_name":"BlobParser",
     "serverfarm_externalid":"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.Web/serverfarms/',variables('serverfarms_host_name'))]",
     "resourceTags":{
             "OwnerEmail": "Snsandler@rockwellautomation.com",

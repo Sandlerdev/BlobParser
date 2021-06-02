@@ -478,10 +478,10 @@
                 "[resourceId('Microsoft.Web/sites', variables('funcApp_name'))]"
             ],
             "properties": {
-                "script_root_path_href": "[concat('https://',variables('funcApp_name'),'.azurewebsites.net/admin/vfs/home/site/wwwroot/',variables('funcApp_name'),'/')]",
-                "script_href": "[concat('https://',variables('funcApp_name'),'.azurewebsites.net/admin/vfs/home/site/wwwroot/bin/',variables('funcApp_name'),'.dll')]",
-                "config_href": "[concat('https://',variables('funcApp_name'),'.azurewebsites.net/admin/vfs/home/site/wwwroot/',variables('funcApp_name'),'/function.json')]",
-                "href": "[concat('https://',variables('funcApp_name'),'.azurewebsites.net/admin/functions/',variables('funcApp_name'))]",
+                // "script_root_path_href": "[concat('https://',variables('funcApp_name'),'.azurewebsites.net/admin/vfs/home/site/wwwroot/',variables('funcApp_name'),'/')]",
+                // "script_href": "[concat('https://',variables('funcApp_name'),'.azurewebsites.net/admin/vfs/home/site/wwwroot/bin/',variables('funcApp_name'),'.dll')]",
+                // "config_href": "[concat('https://',variables('funcApp_name'),'.azurewebsites.net/admin/vfs/home/site/wwwroot/',variables('funcApp_name'),'/function.json')]",
+                // "href": "[concat('https://',variables('funcApp_name'),'.azurewebsites.net/admin/functions/',variables('funcApp_name'))]",
                 "config": {}
             }
         },

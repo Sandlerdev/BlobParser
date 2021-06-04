@@ -86,7 +86,7 @@
         },
     "bootstrapRoleAssignmentId": "[guid(concat(resourceGroup().id, 'contributor'))]",
     "contributorRoleDefinitionId": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
-    "storageconnection": "[Concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';EndpointSuffix=',environment().suffixes.storage,';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
+
 
 
   },
@@ -367,7 +367,7 @@
           "forceUpdateTag": "[parameters('utcValue')]",
           "AzCliVersion": "2.15.0",
           "timeout": "PT30M",
-          "arguments": "[concat(subscription().id, ' ', resourceGroup().name, ' ', variables('funcApp_name'), ' ', variables('storageAccountName'), ' ', variables('serverfarms_host_name'), ' ',variables('storageconnection'),' ', concat('Server=tcp:', reference(resourceId('Microsoft.Sql/servers/', variables('sql_server_name'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('sql_db_name'), ';User Id=', parameters('sqlAdminLogin'), '@', variables('sql_server_name'), ';Password=', parameters('sqlAdminPassword'), ';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;') )]",
+          "arguments": "[concat(subscription().id, ' ', resourceGroup().name, ' ', variables('funcApp_name'), ' ', variables('storageAccountName'), ' ', variables('serverfarms_host_name'), ' ',Concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';EndpointSuffix=',environment().suffixes.storage,';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value),' ', concat('Server=tcp:', reference(resourceId('Microsoft.Sql/servers/', variables('sql_server_name'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('sql_db_name'), ';User Id=', parameters('sqlAdminLogin'), '@', variables('sql_server_name'), ';Password=', parameters('sqlAdminPassword'), ';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;') )]",
           "scriptContent": "az functionapp create --name $3 --storage-account $4 --resource-group $2 --plan $5 --functions-version 2 --runtime dotnet --deployment-container-image-name scottsa/blobparser:latest \r\n az functionapp config appsettings set --name $3 --resource-group $2 --settings AzureWebJobsStorage=$6 \r\n az functionapp config connection-string set --name $3 --resource-group $2 --settings -t SQLAzure SQLConnectionString=$7",
           "cleanupPreference": "OnSuccess",
           "retentionInterval": "PT1H"

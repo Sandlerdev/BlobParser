@@ -313,27 +313,6 @@
                 "retentionDays": 7
             }
         }
-    //   {
-    //   "type": "Microsoft.Resources/deploymentScripts",
-    //   "apiVersion": "2020-10-01",
-    //   "name": "DeployFunctionApp",
-    //   "location": "[resourceGroup().location]",
-    //   "kind": "AzureCLI",
-    //   "properties": {
-    //     "forceUpdateTag": "[parameters('utcValue')]",
-    //     "AzCliVersion": "2.15.0",
-    //     "timeout": "PT30M",
-    //     "arguments": "[concat(subscription().id, ' ', resourceGroup().name, ' ', variables('funcApp_name'), ' ', variables('storageAccountName'), ' ', variables('serverfarms_host_name'))]",
-    //     "scriptContent": "az account set --subscription $1 
-    //     az functionapp create --name $3 --storage-account $4 --resource-group $2--plan $5 --runtime dotnet --deployment-container-image-name scottsa/blobparser:latest",
-    //     "cleanupPreference": "OnSuccess",
-    //     "retentionInterval": "PT1H"
-    //   }
-    // }
-       
-      
-
-
   ],
   "outputs": {
 

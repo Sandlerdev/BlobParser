@@ -48,20 +48,14 @@
             }
 
         },
-        // "Table Name": {
-        //     "type": "string",
-        //     "defaultValue": "FTEG_Data_test",
-        //     "metadata":{
-        //         "description":"Name of the Table that data will be stored in, inside the SQL Server Database."
-        //     }
-        // },
-         "utcValue": {
-      "type": "string",
-      "defaultValue": "[utcNow()]",
-      "metadata":{
-        "description":"This value is used to ensure CLI Scripts are rerun with each execution."
-      }
-    }
+       
+        "utcValue": {
+          "type": "string",
+          "defaultValue": "[utcNow()]",
+          "metadata":{
+            "description":"This value is used to ensure CLI Scripts are rerun with each execution."
+          }
+        }
 
   },
   "variables": {
@@ -74,8 +68,6 @@
     "sql_server_name": "[concat(parameters('projectName'), '-sql-', uniqueString(resourceGroup().id))]",
     "sql_db_name":"[concat(parameters('projectName'), '-db-', uniqueString(resourceGroup().id))]",
     "funcApp_name":"[concat(parameters('projectName'), '-func-', uniqueString(resourceGroup().id))]",
-    //"funcApp_name":"BlobParser",
-    // "serverfarm_externalid":"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.Web/serverfarms/',variables('serverfarms_host_name'))]",
     "resourceTags":{
             "OwnerEmail": "Snsandler@rockwellautomation.com",
             "Environment": "Sandbox",
@@ -84,11 +76,7 @@
             "Capability": "Design and Develop Product Offering",
             "CostCenter": "13065",
             "DataClassification": "Confidential"
-        }//,
-    // "DOCKER_REGISTRY_SERVER_URL":"https://dtodevregistry.azurecr.io",
-    // "DOCKER_REGISTRY_SERVER_USERNAME":"DTODevRegistry",
-    // "DOCKER_REGISTRY_SERVER_PASSWORD":"oFEMlwhbAjYpyIcBRfh/cSnu/Dx/U8FW",
-    // "containerImage":"DOCKER|dtodevregistry.azurecr.io/blobparser:latest"
+        }
 
 
   },
@@ -255,8 +243,8 @@
                 "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
                 "zoneRedundant": false,
                 "readScale": "Disabled",
-                "storageAccountType": "GRS"//,
-                //"maintenanceConfigurationId": "/subscriptions/dfbdbcfc-969a-4679-86c0-ad2c438e14ae/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default"
+                "storageAccountType": "GRS"
+                
             }
         },
 
@@ -328,16 +316,9 @@
          {
       "type": "Microsoft.Resources/deploymentScripts",
       "apiVersion": "2020-10-01",
-      "name": "runBashWithOutputs",
+      "name": "DeployFunctionApp",
       "location": "[resourceGroup().location]",
       "kind": "AzureCLI",
-      // "identity": {
-      //   "type": "UserAssigned",
-      //   "userAssignedIdentities": {
-      //     "[parameters('identity')]": {
-      //     }
-      //   }
-      // },
       "properties": {
         "forceUpdateTag": "[parameters('utcValue')]",
         "AzCliVersion": "2.15.0",

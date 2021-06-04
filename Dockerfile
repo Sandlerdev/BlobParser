@@ -15,10 +15,6 @@ FROM mcr.microsoft.com/azure-functions/dotnet:3.0-appservice
 ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
     AzureFunctionsJobHost__Logging__Console__IsEnabled=true
 
-ENV table_name FTEG_Data
-ENV storageconnection ConnectionToFiles
-ENV SQLAZURECONNSTR_SQLConnectionString SQLDBConnectionString
-ENV AzureWebJobsStorage StorageForFunction
 
 
 COPY --from=installer-env ["/home/site/wwwroot", "/home/site/wwwroot"]

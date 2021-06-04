@@ -312,7 +312,7 @@
             "properties": {
                 "retentionDays": 7
             }
-        },
+        }
     //   {
     //   "type": "Microsoft.Resources/deploymentScripts",
     //   "apiVersion": "2020-10-01",

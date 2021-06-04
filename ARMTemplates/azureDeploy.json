@@ -387,10 +387,12 @@
 
                     }
                 ]
+                
                 // "DOCKER_CUSTOM_IMAGE_NAME": "[variables('containerImage')]",
                 // "linuxFxVersion": "[variables('containerImage')]",
                 // "alwaysOn": true
             }
+            
 
             }
         },

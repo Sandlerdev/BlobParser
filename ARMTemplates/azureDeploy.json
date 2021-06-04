@@ -48,13 +48,13 @@
             }
 
         },
-        "Table Name": {
-            "type": "string",
-            "defaultValue": "FTEG_Data_test",
-            "metadata":{
-                "description":"Name of the Table that data will be stored in, inside the SQL Server Database."
-            }
-        },
+        // "Table Name": {
+        //     "type": "string",
+        //     "defaultValue": "FTEG_Data_test",
+        //     "metadata":{
+        //         "description":"Name of the Table that data will be stored in, inside the SQL Server Database."
+        //     }
+        // },
          "utcValue": {
       "type": "string",
       "defaultValue": "[utcNow()]",
@@ -73,9 +73,9 @@
     "serverfarms_host_name":"[concat(parameters('projectName'), '-host-', uniqueString(resourceGroup().id))]",
     "sql_server_name": "[concat(parameters('projectName'), '-sql-', uniqueString(resourceGroup().id))]",
     "sql_db_name":"[concat(parameters('projectName'), '-db-', uniqueString(resourceGroup().id))]",
-    "funcApp_name":"[concat(parameters('projectName'), '-func3-', uniqueString(resourceGroup().id))]",
+    "funcApp_name":"[concat(parameters('projectName'), '-func-', uniqueString(resourceGroup().id))]",
     //"funcApp_name":"BlobParser",
-    "serverfarm_externalid":"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.Web/serverfarms/',variables('serverfarms_host_name'))]",
+    // "serverfarm_externalid":"[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name,'/providers/Microsoft.Web/serverfarms/',variables('serverfarms_host_name'))]",
     "resourceTags":{
             "OwnerEmail": "Snsandler@rockwellautomation.com",
             "Environment": "Sandbox",
@@ -85,10 +85,10 @@
             "CostCenter": "13065",
             "DataClassification": "Confidential"
         },
-    "DOCKER_REGISTRY_SERVER_URL":"https://dtodevregistry.azurecr.io",
-    "DOCKER_REGISTRY_SERVER_USERNAME":"DTODevRegistry",
-    "DOCKER_REGISTRY_SERVER_PASSWORD":"oFEMlwhbAjYpyIcBRfh/cSnu/Dx/U8FW",
-    "containerImage":"DOCKER|dtodevregistry.azurecr.io/blobparser:latest"
+    // "DOCKER_REGISTRY_SERVER_URL":"https://dtodevregistry.azurecr.io",
+    // "DOCKER_REGISTRY_SERVER_USERNAME":"DTODevRegistry",
+    // "DOCKER_REGISTRY_SERVER_PASSWORD":"oFEMlwhbAjYpyIcBRfh/cSnu/Dx/U8FW",
+    // "containerImage":"DOCKER|dtodevregistry.azurecr.io/blobparser:latest"
 
 
   },
@@ -349,188 +349,7 @@
         "retentionInterval": "PT1H"
       }
     }
-        // {
-        //     "type": "Microsoft.Web/sites",
-        //     "apiVersion": "2018-11-01",
-        //     "name": "[variables('funcApp_name')]",
-        //     "location": "[variables('location')]",
-        //     "tags": "[variables('resourceTags')]",
-        //     "dependsOn": [
-        //                     "[resourceId('Microsoft.Sql/servers', variables('sql_server_name'))]",
-        //                     "[resourceId('Microsoft.Sql/servers/databases', variables('sql_server_name'), variables('sql_db_name'))]",
-        //                     "[resourceId('Microsoft.Web/serverfarms',variables('serverfarms_host_name'))]",
-        //                     "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
-        //                 ],
-        //     "kind": "app,linux,container",
-        //     "properties": {
-        //         "enabled": true,
-
-        //         "serverFarmId": "[variables('serverfarm_externalid')]",
-        //         "reserved": true,
-        //         "isXenon": false,
-        //         "hyperV": false,
-        //         "httpsOnly": true,
-        //         "siteConfig": {
-        //         "appSettings":[
-        //             {
-        //                 "name": "AzureWebJobsStorage",
-        //                 "value": "[Concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';EndpointSuffix=',environment().suffixes.storage,';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
-        //             },
-        //             {
-        //                 "name": "storageconnection",
-        //                 "value": "[Concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';EndpointSuffix=',environment().suffixes.storage,';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
-        //             },
-        //             {
-        //                 "name": "FUNCTIONS_EXTENSION_VERSION",
-        //                 "value": "~3"
-        //             },
-        //             {
-        //                 "name": "FUNCTIONS_WORKER_RUNTIME",
-        //                 "value": "dotnet"
-        //             },
-
-        //             {
-        //                 "name": "DOCKER_REGISTRY_SERVER_URL",
-        //                 "value": "[variables('DOCKER_REGISTRY_SERVER_URL')]"
-        //             },
-        //             {
-        //                 "name": "DOCKER_REGISTRY_SERVER_USERNAME",
-        //                 "value": "[variables('DOCKER_REGISTRY_SERVER_USERNAME')]"
-        //             },
-        //             {
-        //                 "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
-        //                 "value": "[variables('DOCKER_REGISTRY_SERVER_PASSWORD')]"
-        //             },
-        //             {
-
-        //                 "name": "table_name",
-        //                 "value": "[parameters('Table Name')]"
-        //             }
-
-        //         ],
-        //         "connectionStrings": [
-        //             {
-
-        //                 "name":"SQLConnectionString",
-        //                 "connectionString": "[concat('Server=tcp:', reference(resourceId('Microsoft.Sql/servers/', variables('sql_server_name'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('sql_db_name'), ';User Id=', parameters('sqlAdminLogin'), '@', variables('sql_server_name'), ';Password=', parameters('sqlAdminPassword'), ';MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;')]",
-        //                 "type": "SQLAzure"
-
-
-        //             }
-        //         ]
-                
-        //         // "DOCKER_CUSTOM_IMAGE_NAME": "[variables('containerImage')]",
-        //         // "linuxFxVersion": "[variables('containerImage')]",
-        //         // "alwaysOn": true
-        //     }
-            
-
-        //     }
-        // },
-        // {
-        //   "type": "Microsoft.Web/sites/config",
-        //     "apiVersion": "2018-11-01",
-        //     "name": "[concat(variables('funcApp_name'), '/web')]",
-        //     "location": "[variables('location')]",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Web/sites', variables('funcApp_name'))]"
-        //     ],
-        //     "tags": "[variables('resourceTags')]",
-        //     "properties": {
-        //         "numberOfWorkers": 1,
-        //         "defaultDocuments": [
-        //             "Default.htm",
-        //             "Default.html",
-        //             "Default.asp",
-        //             "index.htm",
-        //             "index.html",
-        //             "iisstart.htm",
-        //             "default.aspx",
-        //             "index.php",
-        //             "hostingstart.html"
-        //         ],
-        //         "netFrameworkVersion": "v4.0",
-        //         "linuxFxVersion": "[variables('containerImage')]",
-        //         "requestTracingEnabled": false,
-        //         "remoteDebuggingEnabled": true,
-        //         "remoteDebuggingVersion": "VS2019",
-        //         "httpLoggingEnabled": true,
-        //         "logsDirectorySizeLimit": 35,
-        //         "detailedErrorLoggingEnabled": false,
-        //         //"publishingUsername": "$BlobParser",
-        //         "azureStorageAccounts": {},
-        //         "scmType": "None",
-        //         "use32BitWorkerProcess": true,
-        //         "webSocketsEnabled": false,
-        //         "alwaysOn": true,
-        //         "managedPipelineMode": "Integrated",
-        //         "virtualApplications": [
-        //             {
-        //                 "virtualPath": "/",
-        //                 "physicalPath": "site\\wwwroot",
-        //                 "preloadEnabled": true
-        //             }
-        //         ],
-        //         "loadBalancing": "LeastRequests",
-        //         "experiments": {
-        //             "rampUpRules": []
-        //         },
-        //         "autoHealEnabled": false,
-        //         "localMySqlEnabled": false,
-        //         "ipSecurityRestrictions": [
-        //             {
-        //                 "ipAddress": "Any",
-        //                 "action": "Allow",
-        //                 "priority": 1,
-        //                 "name": "Allow all",
-        //                 "description": "Allow all access"
-        //             }
-        //         ],
-        //         "scmIpSecurityRestrictions": [
-        //             {
-        //                 "ipAddress": "Any",
-        //                 "action": "Allow",
-        //                 "priority": 1,
-        //                 "name": "Allow all",
-        //                 "description": "Allow all access"
-        //             }
-        //         ],
-        //         "scmIpSecurityRestrictionsUseMain": false,
-        //         "http20Enabled": false,
-        //         "minTlsVersion": "1.2",
-        //         "ftpsState": "AllAllowed",
-        //         "reservedInstanceCount": 0
-        //     }
-        // },
-        // //   {
-        // //     "type": "Microsoft.Web/sites/functions",
-        // //     "apiVersion": "2018-11-01",
-        // //     "name": "[concat(variables('funcApp_name'), '/', variables('funcApp_name'))]",
-        // //     "location": "[variables('location')]",
-        // //     "dependsOn": [
-        // //         "[resourceId('Microsoft.Web/sites', variables('funcApp_name'))]"
-        // //     ],
-        // //     "properties": {
-        // //         // "script_root_path_href": "[concat('https://',variables('funcApp_name'),'.azurewebsites.net/admin/vfs/home/site/wwwroot/',variables('funcApp_name'),'/')]",
-        // //         // "script_href": "[concat('https://',variables('funcApp_name'),'.azurewebsites.net/admin/vfs/home/site/wwwroot/bin/',variables('funcApp_name'),'.dll')]",
-        // //         // "config_href": "[concat('https://',variables('funcApp_name'),'.azurewebsites.net/admin/vfs/home/site/wwwroot/',variables('funcApp_name'),'/function.json')]",
-        // //         // "href": "[concat('https://',variables('funcApp_name'),'.azurewebsites.net/admin/functions/',variables('funcApp_name'))]",
-        // //         //"config": {}
-        // //     }
-        // // },
-        // {
-        //     "type": "Microsoft.Web/sites/hostNameBindings",
-        //     "apiVersion": "2018-11-01",
-        //     "name": "[concat(variables('funcApp_name'), '/', variables('funcApp_name'), '.azurewebsites.net')]",
-        //     "location": "[variables('location')]",
-        //     "dependsOn": [
-        //         "[resourceId('Microsoft.Web/sites', variables('funcApp_name'))]"
-        //     ],
-        //     "properties": {
-        //         "siteName": "[variables('funcApp_name')]",
-        //         "hostNameType": "Verified"
-        //     }
-        // }
+       
       
 
 

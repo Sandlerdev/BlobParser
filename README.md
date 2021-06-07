@@ -1,19 +1,16 @@
 # Blob Parser
 
-## Overview
-
-Azure Function created in Visual Studio 2019 targeting .Net Core (C#).  Function uses a Blob Trigger and then parses the data and inserts the data into a SQL DB.
-
-Data in blob is populated by IoT Hub Routing - data originates from FTEG, giving us a well known data format.
-
 ## Solution Architecture
+This solution was created as a sample architecture that would simplify the ingestion of data from FactoryTalk Edge Gateway into Azure IoT Hub and subsequently other Azure Resources.  
+
+This solution can certainly function as is, however, changes to resources can be achieved by editing the associated ARM Template file used to deploy the resources.  
 
 ![High-Level Architecture](./out/diagrams/solution/solution.png)
 
 The architecture in this solution was selected to meet the following requirements:
 
 1. All Data received by the IoTHub will be added to long term storage.
-2. Add Data received will be made available to clients via interface to well known SQL endpoint.
+2. Data received will be made available to clients via interface to well known SQL endpoint.
 3. Data in SQL DB will have a variable time to live (hence the need for long term storage).
 4. In the future it may be necessary to route this data to other storage and or services.
 
@@ -23,10 +20,18 @@ This repo contains an ARM Template which can be used to deploy this solution.  Y
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FSandlerdev%2FBlobParser%2Fmaster%2FARMTemplates%2FazureDeploy.json)
 
+After deployment is complete you will need to configure one or more IoT Hub Devices and subsequently configure FactoryTalk Edge Gateway to send data to this application.  
 
+See FactoryTalk Edge Gateway documentation for more details.
+## Blob Parser Function Overview
+The Azure Function in this solution was created in Visual Studio Code and targets .Net Core (C#).  The Function uses a Blob Trigger, which causes the function to be called each time a new blob is written to the storage account.  The logic in the function validates the file type, then parses the data and inserts the data into the SQL DB.
+
+Data in blob is populated by IoT Hub Routing - data originates from FTEG, giving us a well known data format.
+
+*It should be noted that while this function will be triggered by any file being written to the "Iotdata" container in the soluion 
 ## Local Build and Debugging
 
-To run this project locally you will need Visual Studio 2019 or VSCode.  See the following article for more info:
+To run or debug this Azure Function locally you will need Visual Studio 2019 or VSCode installed.  See the following article for more info:
 [Develop Azure Functions Using Visual Studio](https://docs.microsoft.com/en-us/azure/azure-functions/functions-develop-vs)
 
 ### Connection Strings etc

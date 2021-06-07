@@ -349,7 +349,9 @@
         "name": "DeployFunctionApp",
         "dependsOn":[
           "[resourceId('Microsoft.Authorization/roleAssignments', variables('bootstrapRoleAssignmentId'))]",
-          "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identityName'))]"
+          "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identityName'))]",
+          "[resourceId('Microsoft.Sql/servers/databases', variables('sql_server_name'), variables('sql_db_name'))]",
+          "[resourceId('Microsoft.Sql/servers', variables('sql_server_name'))]"
         ],
         "location": "[resourceGroup().location]",
         "kind": "AzureCLI",

@@ -21,7 +21,7 @@ Boundary(cloud,"Azure Cloud Environment"){
     AzureBlobStorage(blob,"Blob Storage of IoT Data","LRS")
 
 
-    AzureFunction(func_blobParser,"Blob Parser","C# - Blob Trigger","Hosted on AppService")
+    AzureFunction(func_blobParser,"Blob Parser","C# - Blob Trigger","AZ Function Built as Container - Hosted on AppService")
     AzureSqlDatabase(sql,"SQL DB", "DB Storage of IoT Data")
 
 }

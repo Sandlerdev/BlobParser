@@ -28,7 +28,7 @@ The Azure Function in this solution was created in Visual Studio Code and target
 
 Data in blob is populated by IoT Hub Routing - data originates from FTEG, giving us a well known data format.
 
-*It should be noted that while this function will be triggered by any file being written to the "Iotdata" container in the soluion 
+*It should be noted that while this function will be triggered by any file being written to the "Iotdata" container in the solution's Storage Account, it is expecting data formatted consistently with what is currently sent from FTEG.*
 ## Local Build and Debugging
 
 To run or debug this Azure Function locally you will need Visual Studio 2019 or VSCode installed.  See the following article for more info:

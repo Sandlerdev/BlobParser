@@ -49,7 +49,7 @@ Data in blob is populated by IoT Hub Routing - data originates from FTEG, giving
 ## Local Build and Debugging
 
 To run or debug this Azure Function locally you will need Visual Studio 2019 or VSCode installed.  See the following article for more info:
-[Develop Azure Functions Using Visual Studio](https://docs.microsoft.com/en-us/azure/azure-functions/functions-develop-vs)
+[Develop Azure Functions Using VS Code](https://docs.microsoft.com/en-us/azure/azure-functions/functions-develop-vs-code?tabs=csharp)
 
 ### Connection Strings etc
 

@@ -23,21 +23,21 @@ This repo contains an ARM Template which can be used to deploy this solution.  Y
 *The Deployment generally takes 5 to 10 minutes, once complete you should be presented with a button that will take you to your resource group.*
 
 Once complete the resource group will look similar to this:
-![RG deployment](.\images\resourcegroup.png)
+![RG deployment](./images/resourcegroup.png)
 
 *Note there may be other objects in the resource group as well.  The deployment logic will create a storage account and an Azure Container instance in order to execute an Azure CLI Script.  These Resources will automatically be deleted after approximately one hour.*
 
 ## Configuring an IOT Hub Device
 
 After deployment is complete you will need to configure one or more IoT Hub Devices.
-![Create Device](.\images\CreateIOTHubDevice.png)
+![Create Device](./images/CreateIOTHubDevice.png)
 
 Once the device is created, click on the new device, and copy its Connection String to use in the FTEG Configuration.
 
-![Get Connection String](.\images\GetIOTDeviceCS.png)
+![Get Connection String](./images/GetIOTDeviceCS.png)
 
 After you have configured your device in IoT Hub, you need to configure the FactoryTalk Edge Gateway to send data to this application.  
-![FTEG Config](.\images\FTEG.png)
+![FTEG Config](./images/FTEG.png)
 
 See FactoryTalk Edge Gateway documentation for more details.
 ## Blob Parser Function Overview

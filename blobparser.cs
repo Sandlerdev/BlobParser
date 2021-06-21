@@ -16,35 +16,79 @@ namespace blobparser
     public static class blobparser
     {
         public static string _tableName;
+        public static bool _fireTriggers = false;
         public static ILogger _log;
         public static string _sqlconnectionString;
         public static bool _createdTable = false;
+        public static Int32 _deletion_threshold = 24;
         [FunctionName("blobparser")]
         public static void Run([BlobTrigger("iotdata/{name}", Connection = "storageconnection")]Stream myBlob, string name, ILogger log, ExecutionContext context)
         {
-            //log.LogInformation($"C# Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes");
-                        _log = log;
+            try
+                {
+                //log.LogInformation($"C# Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes");
+                            _log = log;
 
-            if (name.EndsWith(".json"))
+                if (name.EndsWith(".json"))
+                {
+                    var config = new ConfigurationBuilder()
+                        .SetBasePath(context.FunctionAppDirectory)
+                        .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                        .AddEnvironmentVariables()
+                        .Build();
+                    string myConnectionString = config["ConnectionStrings:SQLConnectionString"];
+                    _sqlconnectionString = myConnectionString;
+                    string table_name = config["table_name"];
+                    _tableName = table_name;
+                    string fire_triggers = config["fire_triggers"];
+                    _fireTriggers = Convert.ToBoolean(fire_triggers);
+                    string delete_threshold = config["delete_threshold"];
+                    _deletion_threshold = Convert.ToInt32(delete_threshold);
+
+                    ParseBlob(myBlob, name);
+
+
+                }
+                    DeleteOldData();
+                }
+            catch(Exception e)
             {
-                var config = new ConfigurationBuilder()
-                     .SetBasePath(context.FunctionAppDirectory)
-                     .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-                     .AddEnvironmentVariables()
-                     .Build();
-                string myConnectionString = config["ConnectionStrings:SQLConnectionString"];
-                _sqlconnectionString = myConnectionString;
-                string table_name = config["table_name"];
-                _tableName = table_name;
-
-
-                ParseBlob(myBlob, name);
-
-
+                _log.LogError("Error executing Blob Parser: " + e.Message);
+               // throw;
             }
 
-            log.LogInformation($"C# Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes");
+            //log.LogInformation($"C# Blob trigger function Processed blob\n Name:{name} \n Size: {myBlob.Length} Bytes");
         }
+
+         private static void DeleteOldData()
+        {
+            try
+            {
+                if (Convert.ToInt32(_deletion_threshold) != 0)
+                    {
+                    _log.LogInformation($"Deleting data older than deletion threshold of {_deletion_threshold} hours.");
+                    using (SqlConnection con = new SqlConnection(_sqlconnectionString))
+                    {
+                        string sql = @$"delete {_tableName} where T <= DateAdd(hour,-{_deletion_threshold},GetDate())";
+                        using (SqlCommand cmd = new SqlCommand(sql))
+                        {
+                            cmd.Connection = con;
+                            con.Open();
+                            cmd.ExecuteNonQuery();
+                            con.Close();
+                        }
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                _log.LogError("Exception during DeleteOldData: " + e.Message);
+                throw;
+            }
+
+        }
+
+
          private static void CreateSQLTable()
         {
 
@@ -53,15 +97,20 @@ namespace blobparser
             {
                 string sql = @$"IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{_tableName}]') AND type in (N'U'))
                                 BEGIN
-                                CREATE TABLE [dbo].[{_tableName}](
-	                                [DeviceID] [varchar](800) NULL,
-	                                [TagID] [varchar](800) NULL,
-	                                [ModelID] [varchar](800) NULL,
-	                                [V] [varchar](800) NULL,
-	                                [Q] [varchar](800) NULL,
-	                                [T] [varchar](800) NULL,
-	                                [MimeType] [varchar](800) NULL
-                                ) ON [PRIMARY]
+                                    CREATE TABLE [dbo].[{_tableName}](
+                                        [DeviceID] [varchar](800) NULL,
+                                        [TagID] [varchar](800) NULL,
+                                        [ModelID] [varchar](800) NOT NULL,
+                                        [V] [varchar](800) NULL,
+                                        [Q] [varchar](800) NULL,
+                                        [T] [datetime] NOT NULL,
+                                        [MimeType] [varchar](800) NULL,
+                                    CONSTRAINT [PK_{_tableName}] PRIMARY KEY CLUSTERED 
+                                    (
+                                        [ModelID] ASC,
+                                        [T] ASC
+                                    )WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+                                    ) ON [PRIMARY]
                                 END";
                 using (SqlCommand cmd = new SqlCommand(sql))
                 {
@@ -114,6 +163,7 @@ namespace blobparser
             catch (Exception e)
             {
                 _log.LogError($"Error when processing {name}.  Exception: {e.Message}.");
+                throw;
             }
 
         }
@@ -156,12 +206,32 @@ namespace blobparser
         }
         public static void WritetoDB(DataTable dt)
         {
-            if(_createdTable == false)
+            try
             {
-                CreateSQLTable();
+                if(_createdTable == false)
+                {
+                    CreateSQLTable();
+                }
+                if (_fireTriggers == true)
+                {
+                    SqlBulkCopy bulkcopy = new SqlBulkCopy(_sqlconnectionString, SqlBulkCopyOptions.FireTriggers);
+                    DoBulkCopy(dt,bulkcopy);
+                }
+                else 
+                {
+                    SqlBulkCopy bulkcopy = new SqlBulkCopy(_sqlconnectionString);
+                    DoBulkCopy(dt,bulkcopy);
+                }
             }
-            SqlBulkCopy bulkcopy = new SqlBulkCopy(_sqlconnectionString);
-            bulkcopy.DestinationTableName = _tableName;
+            catch (Exception e)
+            {
+                _log.LogError(e.Message.ToString());
+                throw;
+            }
+        }
+        public static void DoBulkCopy(DataTable dt, SqlBulkCopy bulkcopy)
+        {
+                bulkcopy.DestinationTableName = _tableName;
 
             try
             {
@@ -170,6 +240,7 @@ namespace blobparser
             catch (Exception e)
             {
                 _log.LogError(e.Message.ToString());
+                throw;
             }
             _log.LogInformation("Wrote some JSON to SQL");
         }
